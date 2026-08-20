@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WhatsApp Style Chat</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="chat-app">
+
+    <!-- LEFT SIDEBAR -->
+    <div class="sidebar">
+
+        <div class="sidebar-header">
+            <h2>Chat App</h2>
+            <span>💬</span>
+        </div>
+
+        <!-- Username -->
+        <div class="profile-section">
+            <input id="username" placeholder="Enter your name">
+            <button onclick="joinChat()">Join</button>
+        </div>
+
+        <div class="online-title">
+            <span>Online Users</span>
+        </div>
+
+        <ul id="users" class="users-list"></ul>
+
+        <div class="updates-title">
+            Server Updates
+        </div>
+
+        <ul id="serverUpdates" class="updates-list"></ul>
+
+    </div>
+
+
+    <!-- MAIN CHAT -->
+    <div class="chat-area">
+
+        <!-- CHAT HEADER -->
+        <div class="chat-header">
+
+            <div class="chat-user-icon">
+                👥
+            </div>
+
+            <div>
+                <h3>Chat Room</h3>
+                <span>Online chat</span>
+            </div>
+
+        </div>
+
+
+        <!-- PUBLIC CHAT -->
+        <div class="messages" id="publicChat">
+
+        </div>
+
+
+        <!-- PRIVATE CHAT -->
+        <div class="private-section">
+
+            <div class="private-header">
+                🔒 Private Messages
+            </div>
+
+            <ul id="privateChat"></ul>
+
+        </div>
+
+
+        <!-- MESSAGE INPUT -->
+        <div class="message-area">
+
+            <input
+                id="toUser"
+                placeholder="Username for private message"
+            >
+
+            <input
+                id="publicMsg"
+                placeholder="Type a message..."
+                onkeydown="if(event.key === 'Enter') sendPublic()"
+            >
+
+            <button onclick="sendPublic()" class="send-btn">
+                ➤
+            </button>
+
+            <button onclick="sendPrivate()" class="private-btn">
+                🔒
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+
+const socket = io();
+
+
+/* ================= JOIN CHAT ================= */
+
+function joinChat() {
+
+    const username =
+        document.getElementById("username").value.trim();
+
+    if (username === "") {
+        alert("Please enter your name");
+        return;
+    }
+
+    socket.emit("join", username);
+
+}
+
+
+/* ================= ONLINE USERS ================= */
+
+socket.on("onlineUsers", (users) => {
+
+    const ul = document.getElementById("users");
+
+    ul.innerHTML = "";
+
+    users.forEach((u) => {
+
+        const li = document.createElement("li");
+
+        li.innerHTML = `
+            <div class="user-avatar">
+                ${u.charAt(0).toUpperCase()}
+            </div>
+
+            <div class="user-info">
+                <strong>${u}</strong>
+                <span>online</span>
+            </div>
+        `;
+
+        li.onclick = () => {
+
+            document.getElementById("toUser").value = u;
+
+        };
+
+        ul.appendChild(li);
+
+    });
+
+});
+
+
+/* ================= SERVER UPDATES ================= */
+
+socket.on("serverMessage", (msg) => {
+
+    const li = document.createElement("li");
+
+    li.textContent = msg;
+
+    document
+        .getElementById("serverUpdates")
+        .appendChild(li);
+
+});
+
+
+/* ================= PUBLIC MESSAGE ================= */
+
+function sendPublic() {
+
+    const msg =
+        document.getElementById("publicMsg").value.trim();
+
+    if (msg === "") return;
+
+    socket.emit("publicMessage", msg);
+
+    document.getElementById("publicMsg").value = "";
+
+}
+
+
+/* ================= RECEIVE PUBLIC MESSAGE ================= */
+
+socket.on("publicMessage", (data) => {
+
+    const li = document.createElement("li");
+
+    li.className = "message received";
+
+    li.innerHTML = `
+        <span class="sender">
+            ${data.from}
+        </span>
+
+        <span class="message-text">
+            ${data.text}
+        </span>
+
+        <span class="time">
+            ${new Date().toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit"
+            })}
+        </span>
+    `;
+
+    document
+        .getElementById("publicChat")
+        .appendChild(li);
+
+    scrollChat();
+
+});
+
+
+/* ================= PRIVATE MESSAGE ================= */
+
+function sendPrivate() {
+
+    const to =
+        document.getElementById("toUser").value.trim();
+
+    const text =
+        document.getElementById("publicMsg").value.trim();
+
+    if (to === "" || text === "") {
+
+        alert("Enter username and message");
+
+        return;
+    }
+
+    socket.emit("privateMessage", {
+        to,
+        text
+    });
+
+    document.getElementById("publicMsg").value = "";
+
+}
+
+
+/* ================= RECEIVE PRIVATE MESSAGE ================= */
+
+socket.on("privateMessage", (data) => {
+
+    const li = document.createElement("li");
+
+    li.className = "private-message";
+
+    li.innerHTML = `
+        <span class="private-sender">
+            🔒 ${data.from}
+        </span>
+
+        <span>
+            ${data.text}
+        </span>
+
+        <span class="time">
+            ${new Date().toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit"
+            })}
+        </span>
+    `;
+
+    document
+        .getElementById("privateChat")
+        .appendChild(li);
+
+    scrollPrivate();
+
+});
+
+
+/* ================= SCROLL ================= */
+
+function scrollChat() {
+
+    const chat =
+        document.getElementById("publicChat");
+
+    chat.scrollTop = chat.scrollHeight;
+
+}
+
+
+function scrollPrivate() {
+
+    const chat =
+        document.getElementById("privateChat");
+
+    chat.scrollTop = chat.scrollHeight;
+
+}
+
+</script>
+
+</body>
+</html>
