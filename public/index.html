@@ -1,316 +1,103 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>WhatsApp Style Chat</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>ConvoX — Ultra Chat</title>
+  <meta name="color-scheme" content="light dark" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    try {
+      const t = localStorage.getItem('convox-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.dataset.theme = t;
+    } catch (e) { document.documentElement.dataset.theme = 'dark'; }
+  </script>
+  <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
 
-<div class="chat-app">
+  <!-- Login Modal -->
+  <div class="login" id="login">
+    <form class="glass-card login-card" id="loginForm" autocomplete="off">
+      <div class="brand-badge">
+        <span>⚡ ConvoX v2</span>
+      </div>
+      <h1>Welcome back</h1>
+      <p>Enter your alias to connect to the chat room.</p>
+      
+      <div class="input-wrap">
+        <input id="nameInput" maxlength="20" placeholder="Choose username..." required autofocus />
+      </div>
+      <div class="error" id="loginError" role="alert"></div>
+      <button class="btn-primary" type="submit">Connect to Space →</button>
+    </form>
+  </div>
 
-    <!-- LEFT SIDEBAR -->
-    <div class="sidebar">
+  <!-- Main App View -->
+  <div class="app" id="app" hidden>
+    <div class="scrim" id="scrim"></div>
 
-        <div class="sidebar-header">
-            <h2>ConvoX</h2>
-            <span>💬</span>
+    <aside class="sidebar" id="sidebar">
+      <header class="brand">
+        <div class="brand-title">
+          <div class="logo">⚡</div>
+          <strong>ConvoX</strong>
         </div>
+        <button class="icon-btn" id="themeBtn" title="Toggle Theme">◐</button>
+      </header>
 
-        <!-- Username -->
-        <div class="profile-section">
-            <input id="username" placeholder="Enter your name">
-            <button onclick="joinChat()">Join</button>
+      <nav class="nav-scroller">
+        <div class="section-title">CHANNELS</div>
+        <ul id="channelList"></ul>
+        
+        <div class="section-title">ACTIVE USERS</div>
+        <ul id="userList"></ul>
+      </nav>
+
+      <footer class="me-panel" id="meBar"></footer>
+    </aside>
+
+    <main class="chat">
+      <header class="chat-head">
+        <button class="icon-btn menu-btn" id="menuBtn">☰</button>
+        <div class="chat-info">
+          <strong id="chatTitle"># general</strong>
+          <span id="chatSub">Connecting...</span>
         </div>
-
-        <div class="online-title">
-            <span>Online Users</span>
+        <div class="head-controls">
+          <button class="pill-btn" id="bombToggle" title="Dissolve message after 10s">💣 Bomb</button>
         </div>
+      </header>
 
-        <ul id="users" class="users-list"></ul>
+      <div class="messages" id="messages"></div>
 
-        <div class="updates-title">
-            Server Updates
+      <!-- Quoted Reply Banner -->
+      <div class="reply-preview" id="replyPreview" hidden>
+        <div class="reply-text">
+          <span id="replyUser" style="font-weight:700;"></span>: <span id="replyMsg"></span>
         </div>
-
-        <ul id="serverUpdates" class="updates-list"></ul>
-
-    </div>
-
-
-    <!-- MAIN CHAT -->
-    <div class="chat-area">
-
-        <!-- CHAT HEADER -->
-        <div class="chat-header">
-
-            <div class="chat-user-icon">
-                👥
-            </div>
-
-            <div>
-                <h3>Chat Room</h3>
-                <span>Online chat</span>
-            </div>
-
-        </div>
-
-
-        <!-- PUBLIC CHAT -->
-        <div class="messages" id="publicChat">
-
-        </div>
-
-
-        <!-- PRIVATE CHAT -->
-        <div class="private-section">
-
-            <div class="private-header">
-                🔒 Private Messages
-            </div>
-
-            <ul id="privateChat"></ul>
-
-        </div>
-
-
-        <!-- MESSAGE INPUT -->
-        <div class="message-area">
-
-            <input
-                id="toUser"
-                placeholder="Username for private message"
-            >
-
-            <input
-                id="publicMsg"
-                placeholder="Type a message..."
-                onkeydown="if(event.key === 'Enter') sendPublic()"
-            >
-
-            <button onclick="sendPublic()" class="send-btn">
-                ➤
-            </button>
-
-            <button onclick="sendPrivate()" class="private-btn">
-                🔒
-            </button>
-
-        </div>
-
-    </div>
-
-</div>
-
-
-<script src="/socket.io/socket.io.js"></script>
-
-<script>
-
-const socket = io();
-
-
-/* ================= JOIN CHAT ================= */
-
-function joinChat() {
-
-    const username =
-        document.getElementById("username").value.trim();
-
-    if (username === "") {
-        alert("Please enter your name");
-        return;
-    }
-
-    socket.emit("join", username);
-
-}
-
-
-/* ================= ONLINE USERS ================= */
-
-socket.on("onlineUsers", (users) => {
-
-    const ul = document.getElementById("users");
-
-    ul.innerHTML = "";
-
-    users.forEach((u) => {
-
-        const li = document.createElement("li");
-
-        li.innerHTML = `
-            <div class="user-avatar">
-                ${u.charAt(0).toUpperCase()}
-            </div>
-
-            <div class="user-info">
-                <strong>${u}</strong>
-                <span>online</span>
-            </div>
-        `;
-
-        li.onclick = () => {
-
-            document.getElementById("toUser").value = u;
-
-        };
-
-        ul.appendChild(li);
-
-    });
-
-});
-
-
-/* ================= SERVER UPDATES ================= */
-
-socket.on("serverMessage", (msg) => {
-
-    const li = document.createElement("li");
-
-    li.textContent = msg;
-
-    document
-        .getElementById("serverUpdates")
-        .appendChild(li);
-
-});
-
-
-/* ================= PUBLIC MESSAGE ================= */
-
-function sendPublic() {
-
-    const msg =
-        document.getElementById("publicMsg").value.trim();
-
-    if (msg === "") return;
-
-    socket.emit("publicMessage", msg);
-
-    document.getElementById("publicMsg").value = "";
-
-}
-
-
-/* ================= RECEIVE PUBLIC MESSAGE ================= */
-
-socket.on("publicMessage", (data) => {
-
-    const li = document.createElement("li");
-
-    li.className = "message received";
-
-    li.innerHTML = `
-        <span class="sender">
-            ${data.from}
-        </span>
-
-        <span class="message-text">
-            ${data.text}
-        </span>
-
-        <span class="time">
-            ${new Date().toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit"
-            })}
-        </span>
-    `;
-
-    document
-        .getElementById("publicChat")
-        .appendChild(li);
-
-    scrollChat();
-
-});
-
-
-/* ================= PRIVATE MESSAGE ================= */
-
-function sendPrivate() {
-
-    const to =
-        document.getElementById("toUser").value.trim();
-
-    const text =
-        document.getElementById("publicMsg").value.trim();
-
-    if (to === "" || text === "") {
-
-        alert("Enter username and message");
-
-        return;
-    }
-
-    socket.emit("privateMessage", {
-        to,
-        text
-    });
-
-    document.getElementById("publicMsg").value = "";
-
-}
-
-
-/* ================= RECEIVE PRIVATE MESSAGE ================= */
-
-socket.on("privateMessage", (data) => {
-
-    const li = document.createElement("li");
-
-    li.className = "private-message";
-
-    li.innerHTML = `
-        <span class="private-sender">
-            🔒 ${data.from}
-        </span>
-
-        <span>
-            ${data.text}
-        </span>
-
-        <span class="time">
-            ${new Date().toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit"
-            })}
-        </span>
-    `;
-
-    document
-        .getElementById("privateChat")
-        .appendChild(li);
-
-    scrollPrivate();
-
-});
-
-
-/* ================= SCROLL ================= */
-
-function scrollChat() {
-
-    const chat =
-        document.getElementById("publicChat");
-
-    chat.scrollTop = chat.scrollHeight;
-
-}
-
-
-function scrollPrivate() {
-
-    const chat =
-        document.getElementById("privateChat");
-
-    chat.scrollTop = chat.scrollHeight;
-
-}
-
-</script>
-
+        <button class="icon-btn close-btn" id="cancelReply" type="button">✕</button>
+      </div>
+
+      <!-- Composer -->
+      <form class="composer" id="composer" autocomplete="off">
+        <div class="emoji-pop" id="emojiPop" hidden></div>
+        
+        <button type="button" class="icon-btn" id="emojiBtn" title="Emojis">☺</button>
+        <button type="button" class="icon-btn mic-btn" id="recordBtn" title="Record Voice Note">🎙️️</button>
+        
+        <textarea id="input" rows="1" maxlength="2000" placeholder="Type a message or /poll..."></textarea>
+        
+        <button class="send-btn" type="submit" aria-label="Send">➤</button>
+      </form>
+    </main>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="client.js"></script>
 </body>
 </html>
