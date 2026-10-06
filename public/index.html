@@ -2,102 +2,674 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>ConvoX — Ultra Chat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="color-scheme" content="light dark" />
+
+  <title>ConvoX — Modern Chat</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
   <script>
     try {
-      const t = localStorage.getItem('convox-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-      document.documentElement.dataset.theme = t;
-    } catch (e) { document.documentElement.dataset.theme = 'dark'; }
+      const theme =
+        localStorage.getItem("convox-theme") ||
+        (matchMedia("(prefers-color-scheme: dark)").matches
+          ? "dark"
+          : "light");
+
+      document.documentElement.dataset.theme = theme;
+    } catch (error) {
+      document.documentElement.dataset.theme = "dark";
+    }
   </script>
+
   <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
-  <div class="bg-orb orb-1"></div>
-  <div class="bg-orb orb-2"></div>
 
-  <!-- Login Modal -->
-  <div class="login" id="login">
-    <form class="glass-card login-card" id="loginForm" autocomplete="off">
-      <div class="brand-badge">
-        <span>⚡ ConvoX v2</span>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+
+  <!-- ================= AUTH SCREEN ================= -->
+
+  <section class="auth-screen" id="authScreen">
+
+    <div class="auth-brand">
+
+      <div class="brand-mark">
+        ⚡
       </div>
-      <h1>Welcome back</h1>
-      <p>Enter your alias to connect to the chat room.</p>
-      
-      <div class="input-wrap">
-        <input id="nameInput" maxlength="20" placeholder="Choose username..." required autofocus />
+
+      <div>
+        <strong>ConvoX</strong>
+        <span>Connect. Talk. Collaborate.</span>
       </div>
-      <div class="error" id="loginError" role="alert"></div>
-      <button class="btn-primary" type="submit">Connect to Space →</button>
-    </form>
-  </div>
 
-  <!-- Main App View -->
-  <div class="app" id="app" hidden>
-    <div class="scrim" id="scrim"></div>
+    </div>
 
-    <aside class="sidebar" id="sidebar">
-      <header class="brand">
-        <div class="brand-title">
-          <div class="logo">⚡</div>
-          <strong>ConvoX</strong>
+
+    <div class="auth-layout">
+
+      <!-- LEFT SIDE -->
+
+      <div class="auth-showcase">
+
+        <span class="eyebrow">
+          PRIVATE • FAST • REAL-TIME
+        </span>
+
+        <h1>
+          Your conversations,
+          <br>
+          <span>in one place.</span>
+        </h1>
+
+        <p>
+          Chat with your team, send voice notes, create polls,
+          reply to messages and move between channels without
+          losing context.
+        </p>
+
+
+        <div class="feature-list">
+
+          <div>
+            <span>✓</span>
+
+            <p>
+              <b>Real-time messaging</b>
+              <small>Powered by Socket.IO</small>
+            </p>
+          </div>
+
+
+          <div>
+            <span>✓</span>
+
+            <p>
+              <b>Voice messages</b>
+              <small>Record and send audio instantly</small>
+            </p>
+          </div>
+
+
+          <div>
+            <span>✓</span>
+
+            <p>
+              <b>Channels & DMs</b>
+              <small>Keep conversations organized</small>
+            </p>
+          </div>
+
         </div>
-        <button class="icon-btn" id="themeBtn" title="Toggle Theme">◐</button>
+
+      </div>
+
+
+      <!-- AUTH CARD -->
+
+      <div class="auth-card glass-card">
+
+        <div class="auth-card-head">
+
+          <div>
+
+            <span
+              class="mini-label"
+              id="authEyebrow"
+            >
+              WELCOME BACK
+            </span>
+
+            <h2 id="authTitle">
+              Sign in to ConvoX
+            </h2>
+
+            <p id="authSubtitle">
+              Continue to your conversations.
+            </p>
+
+          </div>
+
+
+          <button
+            class="theme-switch"
+            id="authThemeBtn"
+            type="button"
+          >
+            ◐
+          </button>
+
+        </div>
+
+
+        <!-- TABS -->
+
+        <div class="auth-tabs">
+
+          <button
+            class="auth-tab active"
+            id="loginTab"
+            type="button"
+          >
+            Sign in
+          </button>
+
+          <button
+            class="auth-tab"
+            id="signupTab"
+            type="button"
+          >
+            Create account
+          </button>
+
+        </div>
+
+
+        <!-- FORM -->
+
+        <form id="authForm" autocomplete="off">
+
+          <!-- USERNAME -->
+
+          <label id="nameField">
+
+            <span>
+              Username
+            </span>
+
+            <div class="field">
+
+              <span>＠</span>
+
+              <input
+                id="authName"
+                maxlength="20"
+                autocomplete="username"
+                placeholder="yourname"
+                required
+              />
+
+            </div>
+
+          </label>
+
+
+          <!-- PASSWORD -->
+
+          <label>
+
+            <span>
+              Password
+            </span>
+
+            <div class="field">
+
+              <span>••</span>
+
+              <input
+                id="authPassword"
+                type="password"
+                minlength="6"
+                maxlength="72"
+                autocomplete="current-password"
+                placeholder="Enter your password"
+                required
+              />
+
+              <button
+                type="button"
+                class="password-toggle"
+                id="passwordToggle"
+              >
+                Show
+              </button>
+
+            </div>
+
+          </label>
+
+
+          <!-- CONFIRM PASSWORD -->
+
+          <label
+            id="confirmField"
+            hidden
+          >
+
+            <span>
+              Confirm password
+            </span>
+
+            <div class="field">
+
+              <span>••</span>
+
+              <input
+                id="authConfirm"
+                type="password"
+                minlength="6"
+                maxlength="72"
+                autocomplete="new-password"
+                placeholder="Repeat your password"
+              />
+
+            </div>
+
+          </label>
+
+
+          <div
+            class="auth-error"
+            id="authError"
+            role="alert"
+          ></div>
+
+
+          <button
+            class="auth-submit"
+            id="authSubmit"
+            type="submit"
+          >
+
+            <span id="authSubmitText">
+              Sign in
+            </span>
+
+            <span>→</span>
+
+          </button>
+
+        </form>
+
+
+        <p
+          class="auth-footer"
+          id="authFooter"
+        >
+          Don't have an account?
+
+          <button
+            type="button"
+            id="switchAuth"
+          >
+            Create one
+          </button>
+
+        </p>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- ================= CHAT APP ================= -->
+
+  <div
+    class="app"
+    id="app"
+    hidden
+  >
+
+    <div
+      class="scrim"
+      id="scrim"
+    ></div>
+
+
+    <!-- SIDEBAR -->
+
+    <aside
+      class="sidebar"
+      id="sidebar"
+    >
+
+      <header class="sidebar-head">
+
+        <div class="brand-title">
+
+          <div class="brand-mark small">
+            ⚡
+          </div>
+
+          <div>
+
+            <strong>
+              ConvoX
+            </strong>
+
+            <span>
+              Workspace
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <button
+          class="icon-btn"
+          id="themeBtn"
+          title="Toggle theme"
+        >
+          ◐
+        </button>
+
       </header>
+
+
+      <!-- SEARCH -->
+
+      <div class="workspace-search">
+
+        <span>⌕</span>
+
+        <input
+          id="searchInput"
+          placeholder="Search conversations..."
+        />
+
+        <kbd>
+          Ctrl K
+        </kbd>
+
+      </div>
+
 
       <nav class="nav-scroller">
-        <div class="section-title">CHANNELS</div>
+
+        <div class="section-row">
+
+          <span>
+            CHANNELS
+          </span>
+
+          <span
+            class="count"
+            id="channelCount"
+          >
+            0
+          </span>
+
+        </div>
+
         <ul id="channelList"></ul>
-        
-        <div class="section-title">ACTIVE USERS</div>
+
+
+        <div class="section-row users-title">
+
+          <span>
+            DIRECT MESSAGES
+          </span>
+
+          <span
+            class="count"
+            id="userCount"
+          >
+            0
+          </span>
+
+        </div>
+
         <ul id="userList"></ul>
+
       </nav>
 
-      <footer class="me-panel" id="meBar"></footer>
+
+      <!-- USER -->
+
+      <footer class="me-panel">
+
+        <div
+          class="profile-avatar"
+          id="meAvatar"
+        >
+          C
+        </div>
+
+        <div class="me-info">
+
+          <strong id="meName">
+            User
+          </strong>
+
+          <span>
+            <i></i>
+            Online
+          </span>
+
+        </div>
+
+
+        <button
+          class="icon-btn logout-btn"
+          id="logoutBtn"
+          title="Sign out"
+        >
+          ↪
+        </button>
+
+      </footer>
+
     </aside>
 
+
+    <!-- CHAT -->
+
     <main class="chat">
+
       <header class="chat-head">
-        <button class="icon-btn menu-btn" id="menuBtn">☰</button>
-        <div class="chat-info">
-          <strong id="chatTitle"># general</strong>
-          <span id="chatSub">Connecting...</span>
+
+        <button
+          class="icon-btn menu-btn"
+          id="menuBtn"
+        >
+          ☰
+        </button>
+
+
+        <div class="chat-title-wrap">
+
+          <div
+            class="channel-symbol"
+            id="chatSymbol"
+          >
+            #
+          </div>
+
+          <div class="chat-info">
+
+            <strong id="chatTitle">
+              general
+            </strong>
+
+            <span id="chatSub">
+              Connecting...
+            </span>
+
+          </div>
+
         </div>
+
+
         <div class="head-controls">
-          <button class="pill-btn" id="bombToggle" title="Dissolve message after 10s">💣 Bomb</button>
+
+          <button
+            class="head-icon"
+            id="searchBtn"
+            title="Search"
+          >
+            ⌕
+          </button>
+
+
+          <button
+            class="head-icon"
+            id="bombToggle"
+            title="Self destruct messages"
+          >
+            💣
+          </button>
+
+
+          <div class="online-pill">
+
+            <i></i>
+
+            <span id="onlineCount">
+              0
+            </span>
+
+            online
+
+          </div>
+
         </div>
+
       </header>
 
-      <div class="messages" id="messages"></div>
 
-      <!-- Quoted Reply Banner -->
-      <div class="reply-preview" id="replyPreview" hidden>
-        <div class="reply-text">
-          <span id="replyUser" style="font-weight:700;"></span>: <span id="replyMsg"></span>
+      <!-- MESSAGES -->
+
+      <div
+        class="messages"
+        id="messages"
+      >
+
+        <div
+          class="empty-state"
+          id="emptyState"
+        >
+
+          <div class="empty-icon">
+            💬
+          </div>
+
+          <h3>
+            Start the conversation
+          </h3>
+
+          <p>
+            Send a message, create a poll,
+            or share a voice note.
+          </p>
+
         </div>
-        <button class="icon-btn close-btn" id="cancelReply" type="button">✕</button>
+
       </div>
 
-      <!-- Composer -->
-      <form class="composer" id="composer" autocomplete="off">
-        <div class="emoji-pop" id="emojiPop" hidden></div>
-        
-        <button type="button" class="icon-btn" id="emojiBtn" title="Emojis">☺</button>
-        <button type="button" class="icon-btn mic-btn" id="recordBtn" title="Record Voice Note">🎙️️</button>
-        
-        <textarea id="input" rows="1" maxlength="2000" placeholder="Type a message or /poll..."></textarea>
-        
-        <button class="send-btn" type="submit" aria-label="Send">➤</button>
+
+      <!-- REPLY -->
+
+      <div
+        class="reply-preview"
+        id="replyPreview"
+        hidden
+      >
+
+        <div class="reply-accent"></div>
+
+        <div class="reply-text">
+
+          <small>
+            Replying to
+            <b id="replyUser"></b>
+          </small>
+
+          <span id="replyMsg"></span>
+
+        </div>
+
+
+        <button
+          class="icon-btn"
+          id="cancelReply"
+          type="button"
+        >
+          ✕
+        </button>
+
+      </div>
+
+
+      <!-- COMPOSER -->
+
+      <form
+        class="composer"
+        id="composer"
+        autocomplete="off"
+      >
+
+        <div
+          class="emoji-pop"
+          id="emojiPop"
+          hidden
+        ></div>
+
+
+        <button
+          type="button"
+          class="composer-btn"
+          id="emojiBtn"
+          title="Emoji"
+        >
+          ☺
+        </button>
+
+
+        <button
+          type="button"
+          class="composer-btn"
+          id="recordBtn"
+          title="Voice message"
+        >
+          🎙
+        </button>
+
+
+        <div class="input-shell">
+
+          <textarea
+            id="input"
+            rows="1"
+            maxlength="2000"
+            placeholder="Message #general"
+          ></textarea>
+
+          <div class="input-hint">
+            Enter to send • Shift + Enter for new line
+          </div>
+
+        </div>
+
+
+        <button
+          class="send-btn"
+          type="submit"
+          aria-label="Send"
+        >
+          ➤
+        </button>
+
       </form>
+
     </main>
+
   </div>
+
 
   <script src="/socket.io/socket.io.js"></script>
   <script src="client.js"></script>
+
 </body>
 </html>
